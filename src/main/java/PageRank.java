@@ -9,8 +9,12 @@ public class PageRank {
 
 		final int id;
 		final List<Integer> linkIDs = new ArrayList<>();
+		final List<Double> linkWeights = new ArrayList<>();
 
 		double rankValue = 1.0;
+		boolean rankValueValid = false;
+		boolean rankValueUpToDate = false;
+		double weightSum = 0.0;
 
 		Entity(int id) {
 			this.id = id;
@@ -20,23 +24,41 @@ public class PageRank {
 			return id;
 		}
 
+		double getRankValue() {
+			return rankValue;
+		}
+
+		boolean isRankValueUpToDate() {
+			return rankValueUpToDate;
+		}
+
+		boolean isRankValueValid() {
+			return rankValueValid;
+		}
 	}
 
 	private final double alpha;
+	private final double threshold;
 	private final List<Entity> entities = new ArrayList<>();
 	private final Map<Integer, Integer> indexMap = new HashMap<>();
 
 	public PageRank() {
-		this.alpha = 0.85;
+		this(0.85, 1e-6);
 	}
 
-	public PageRank(double alpha) {
+	public PageRank(double alpha, double threshold) {
 		if (alpha < 0 || alpha > 1) {
 			throw new IllegalArgumentException(String.format(
-					"Illegal argument 'alpha': number inside the intervel [0.0, 1.0] expected, " +
+					"Illegal argument 'alpha': alpha >= 0 && alpha <= 1 expected, " +
 							"%.2f provided.", alpha));
 		}
+		if (threshold <= 0) {
+			throw new IllegalArgumentException(String.format(
+					"Illegal argument 'threshold': threshold > 0 expected, " +
+							"%.2f provided.", threshold));
+		}
 		this.alpha = alpha;
+		this.threshold = threshold;
 	}
 
 	private Entity getEntityWithID(int id) {
@@ -49,26 +71,26 @@ public class PageRank {
 		return entityWithID != null;
 	}
 
-	private void validateId(int id, String argName) {
+	private void validateArgumentId(int id, String argName) {
 		if (!isValidID(id)) {
 			throw new IllegalArgumentException(String.format(
 					"Illegal argument '%s': invalid ID %d.", argName, id));
 		}
 	}
 
-	public void addRef(int fromID, int toID) {
-		validateId(fromID, "fromID");
-		validateId(toID, "toID");
+	public void addRef(int fromID, int toID, double weight) {
+		validateArgumentId(fromID, "fromID");
+		validateArgumentId(toID, "toID");
 	}
 
 	public void removeRef(int fromID, int toID) {
-		validateId(fromID, "fromID");
-		validateId(toID, "toID");
+		validateArgumentId(fromID, "fromID");
+		validateArgumentId(toID, "toID");
 	}
 
 	public boolean hasRef(int fromID, int toID) {
-		validateId(fromID, "fromID");
-		validateId(toID, "toID");
+		validateArgumentId(fromID, "fromID");
+		validateArgumentId(toID, "toID");
 		return false;
 	}
 
@@ -77,23 +99,31 @@ public class PageRank {
 	}
 
 	public void destroyEntity(int id) {
-		validateId(id, "id");
+		validateArgumentId(id, "id");
 	}
 
 	public void updateRankValue() {
 	}
 
 	public double getRankValue(int id) {
-		validateId(id, "id");
-		return 0.0;
+		validateArgumentId(id, "id");
+		Entity entity = getEntityWithID(id);
+		assert entity != null : "Argument validation failed. Something is terribly wrong.";
+		return entity.getRankValue();
 	}
 
 	public boolean isRankValueValid(int id) {
-		return true;
+		validateArgumentId(id, "id");
+		Entity entity = getEntityWithID(id);
+		assert entity != null : "Argument validation failed. Something is terribly wrong.";
+		return entity.isRankValueValid();
 	}
 
 	public boolean isRankValueUpToDate(int id) {
-		return true;
+		validateArgumentId(id, "id");
+		Entity entity = getEntityWithID(id);
+		assert entity != null : "Argument validation failed. Something is terribly wrong.";
+		return entity.isRankValueUpToDate();
 	}
 
 }

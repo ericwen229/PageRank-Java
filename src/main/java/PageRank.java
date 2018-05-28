@@ -78,17 +78,17 @@ public class PageRank {
 		}
 	}
 
-	public void addRef(int fromID, int toID, double weight) {
+	public void addLink(int fromID, int toID, double weight) {
 		validateArgumentId(fromID, "fromID");
 		validateArgumentId(toID, "toID");
 	}
 
-	public void removeRef(int fromID, int toID) {
+	public void removeLink(int fromID, int toID) {
 		validateArgumentId(fromID, "fromID");
 		validateArgumentId(toID, "toID");
 	}
 
-	public boolean hasRef(int fromID, int toID) {
+	public boolean hasLink(int fromID, int toID) {
 		validateArgumentId(fromID, "fromID");
 		validateArgumentId(toID, "toID");
 		return false;

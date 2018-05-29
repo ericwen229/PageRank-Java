@@ -10,8 +10,7 @@ public class PageRank {
 	private class Entity {
 
 		final int id;
-		final List<Integer> linkIDs = new ArrayList<>();
-		final List<Double> linkWeights = new ArrayList<>();
+		final Map<Integer, Double> weightByID = new HashMap<>();
 
 		double rankValue = 1.0;
 		boolean rankValueValid = false;
@@ -42,7 +41,8 @@ public class PageRank {
 	private final double alpha;
 	private final double threshold;
 	private final List<Entity> entities = new ArrayList<>();
-	private final Map<Integer, Integer> indexMap = new HashMap<>();
+	private final Map<Integer, Integer> indexByID = new HashMap<>();
+	private final IDPool idPool = new IDPool();
 
 	public PageRank() {
 		this(0.85, 1e-6);
@@ -64,11 +64,11 @@ public class PageRank {
 	}
 
 	private Entity getEntityWithID(int id) {
-		Integer entityIndex = indexMap.get(id);
+		Integer entityIndex = indexByID.get(id);
 		return entityIndex == null? null: entities.get(entityIndex);
 	}
 
-	private boolean isValidID(int id) {
+	public boolean isValidID(int id) {
 		Entity entityWithID = getEntityWithID(id);
 		return entityWithID != null;
 	}

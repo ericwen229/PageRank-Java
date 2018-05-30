@@ -22,14 +22,14 @@ public class IDPoolTest {
 	@Test
 	public void testReturnToPool() {
 		IDPool pool = new IDPool();
-		for (int i = 0; i < 1000; ++ i) {
+		for (int i = 0; i < 1000; ++i) {
 			int newId = pool.borrowID();
 			pool.returnID(newId);
 		}
-		for (int i = 0; i < 1000; ++ i) {
+		for (int i = 0; i < 1000; ++i) {
 			pool.borrowID();
 		}
-		for (int i = 0; i < 1000; ++ i) {
+		for (int i = 0; i < 1000; ++i) {
 			pool.returnID(i);
 		}
 		for (int i = 0; i < 1000; ++i) {
@@ -39,10 +39,10 @@ public class IDPoolTest {
 	}
 
 	@Test
-	public void testIntervalMerging() {
+	public void testIntervalMerge() {
 		IDPool pool = new IDPool();
 		List<Integer> newIDList = new ArrayList<>();
-		for (int i = 0; i < 1000; ++ i) {
+		for (int i = 0; i < 1000; ++i) {
 			int newID = pool.borrowID();
 			newIDList.add(newID);
 		}

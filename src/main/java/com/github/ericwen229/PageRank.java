@@ -66,6 +66,10 @@ public class PageRank {
 			}
 			return oldWeight; // return old value just like a map does
 		}
+
+		Double getLink(int id) {
+			return weightByID.get(id);
+		}
 	}
 
 	private final double alpha;
@@ -81,13 +85,13 @@ public class PageRank {
 	public PageRank(double alpha, double threshold) {
 		if (alpha < 0 || alpha > 1) {
 			throw new IllegalArgumentException(String.format(
-					"Illegal argument 'alpha': alpha >= 0 && alpha <= 1 expected, " +
-							"%.2f provided.", alpha));
+					"Illegal argument 'alpha': alpha >= 0 &&" +
+							" alpha <= 1 expected, %.2f provided.", alpha));
 		}
 		if (threshold <= 0) {
 			throw new IllegalArgumentException(String.format(
-					"Illegal argument 'threshold': threshold > 0 expected, " +
-							"%.2f provided.", threshold));
+					"Illegal argument 'threshold': threshold > 0" +
+							" expected, %.2f provided.", threshold));
 		}
 		this.alpha = alpha;
 		this.threshold = threshold;
@@ -109,23 +113,30 @@ public class PageRank {
 		}
 	}
 
-	public void addLink(int fromID, int toID, double weight) {
+	public Double putLink(int fromID, int toID, double weight) {
 		validateArgumentID(fromID, "fromID");
 		validateArgumentID(toID, "toID");
-		// TODO
+		if (weight < 0) {
+			throw new IllegalArgumentException(String.format(
+					"Illegal argument 'weight':" +
+							" weight >= 0 expected, %.2f provided", weight));
+		}
+		Entity fromEntity = getEntityWithID(fromID);
+		return fromEntity.putLink(toID, weight);
 	}
 
-	public void removeLink(int fromID, int toID) {
+	public Double removeLink(int fromID, int toID) {
 		validateArgumentID(fromID, "fromID");
 		validateArgumentID(toID, "toID");
-		// TODO
+		Entity fromEntity = getEntityWithID(fromID);
+		return fromEntity.removeLink(toID);
 	}
 
 	public Double getLink(int fromID, int toID) {
 		validateArgumentID(fromID, "fromID");
 		validateArgumentID(toID, "toID");
-		// TODO
-		return null;
+		Entity fromEntity = getEntityWithID(fromID);
+		return fromEntity.getLink(toID);
 	}
 
 	public int createEntity() {

@@ -28,17 +28,9 @@ class IDPool {
 			start = newStart;
 		}
 
-//		void setEnd(int newEnd) {
-//			end = newEnd;
-//		}
-
 		void incrementStartBy(int step) {
 			start += step;
 		}
-
-//		void incrementEndBy(int step) {
-//			end += step;
-//		}
 
 		boolean include(int id) {
 			return (id >= start) && (end == null || id <= end);

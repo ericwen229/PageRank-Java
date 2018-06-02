@@ -106,4 +106,31 @@ public class PageRankTest {
 		assertEquals(rank.getRankValue(d), 0.52, 0.1);
 	}
 
+	@Test
+	public void testRankValueStateInformation() {
+		PageRank rank = new PageRank(0.84, 1e-6);
+		int a = rank.createEntity();
+		int b = rank.createEntity();
+		int c = rank.createEntity();
+		int d = rank.createEntity();
+		rank.putLink(b, a);
+		rank.putLink(c, a);
+		rank.putLink(c, b);
+		rank.putLink(d, b);
+		rank.putLink(d, c);
+		assertFalse(rank.isRankValueValid(a));
+		assertFalse(rank.isRankValueValid(b));
+		assertFalse(rank.isRankValueValid(c));
+		assertFalse(rank.isRankValueValid(d));
+		assertFalse(rank.isRankValueUpToDate());
+		rank.runPageRank();
+		assertTrue(rank.isRankValueValid(a));
+		assertTrue(rank.isRankValueValid(b));
+		assertTrue(rank.isRankValueValid(c));
+		assertTrue(rank.isRankValueValid(d));
+		assertTrue(rank.isRankValueUpToDate());
+		rank.removeLink(b, a);
+		assertFalse(rank.isRankValueUpToDate());
+	}
+
 }

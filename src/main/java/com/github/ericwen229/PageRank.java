@@ -11,7 +11,6 @@ public class PageRank {
 
 		double rankValue = 1.0;
 		boolean rankValueValid = false; // valid if PageRank's been run at least once
-		boolean rankValueUpToDate = false; // up to date if not any modification after last run
 		double totalWeight = 0.0;
 
 		Entity(int id) {
@@ -30,16 +29,8 @@ public class PageRank {
 			this.rankValue = newRankValue;
 		}
 
-		boolean isRankValueUpToDate() {
-			return rankValueUpToDate;
-		}
-
 		boolean isRankValueValid() {
 			return rankValueValid;
-		}
-
-		void setRankValueUpToDate(boolean isUpToDate) {
-			rankValueUpToDate = isUpToDate;
 		}
 
 		void setRankValueValid(boolean isValid) {
@@ -95,6 +86,7 @@ public class PageRank {
 	private final List<Entity> entities = new ArrayList<>();
 	private final Map<Integer, Integer> indexByID = new HashMap<>();
 	private final IDPool idPool = new IDPool();
+	private boolean rankValueUpToDate = false;
 
 	public PageRank() {
 		this(0.85, 1e-6);
@@ -136,7 +128,6 @@ public class PageRank {
 	}
 
 	public Double putLink(int fromID, int toID, double weight) {
-		// TODO: unset up to date
 		validateArgumentID(fromID, "fromID");
 		validateArgumentID(toID, "toID");
 		if (weight < 0) {
@@ -144,14 +135,19 @@ public class PageRank {
 					"Illegal argument 'weight':" +
 							" weight >= 0 expected, %.2f provided", weight));
 		}
+
+		rankValueUpToDate = false;
+
 		Entity fromEntity = getEntityWithID(fromID);
 		return fromEntity.putLink(toID, weight);
 	}
 
 	public Double removeLink(int fromID, int toID) {
-		// TODO: unset up to date
 		validateArgumentID(fromID, "fromID");
 		validateArgumentID(toID, "toID");
+
+		rankValueUpToDate = false;
+
 		Entity fromEntity = getEntityWithID(fromID);
 		return fromEntity.removeLink(toID);
 	}
@@ -172,8 +168,9 @@ public class PageRank {
 	}
 
 	public void destroyEntity(int id) {
-		// TODO: unset up to date if there has a link
 		validateArgumentID(id, "id");
+
+		rankValueUpToDate = false;
 
 		// remove all links pointing to the entity
 		for (Entity entity: entities) {
@@ -236,9 +233,9 @@ public class PageRank {
 			}
 		}
 
+		rankValueUpToDate = true;
 		for (int i = 0; i < entities.size(); ++i) {
 			entities.get(i).setRankValue(PRValues[i]);
-			entities.get(i).setRankValueUpToDate(true);
 			entities.get(i).setRankValueValid(true);
 		}
 	}
@@ -257,11 +254,8 @@ public class PageRank {
 		return entity.isRankValueValid();
 	}
 
-	public boolean isRankValueUpToDate(int id) {
-		validateArgumentID(id, "id");
-		Entity entity = getEntityWithID(id);
-		assert entity != null : "Argument validation failed. Something is terribly wrong.";
-		return entity.isRankValueUpToDate();
+	public boolean isRankValueUpToDate() {
+		return rankValueUpToDate;
 	}
 
 }

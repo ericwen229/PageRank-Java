@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-class IDPool {
+public class IDPool {
 
 	private class Interval {
 
@@ -40,7 +40,7 @@ class IDPool {
 
 	private final List<Interval> intervals;
 
-	IDPool() {
+	public IDPool() {
 		intervals = new LinkedList<>();
 		intervals.add(createInterval(0, null));
 	}
@@ -49,8 +49,19 @@ class IDPool {
 		return new Interval(start, end);
 	}
 
-	int borrowID() {
-		// TODO: overflow may need handling in the future
+	public boolean canBorrowID() {
+		// whether all non-negative IDs have been used
+		// i.e. there's only one interval [INT_MAX, null) left
+		// we can't use INT_MAX, or the interval can't be represented correctly
+		// therefore there're INT_MAX IDs available in total
+		Interval firstInterval = intervals.get(0);
+		return firstInterval.getStart() < Integer.MAX_VALUE;
+	}
+
+	public Integer borrowID() {
+		if (!canBorrowID()) {
+			return null;
+		}
 		Interval firstInterval = intervals.get(0);
 		assert firstInterval != null: "There's supposed to be at lease one interval." +
 				" Something is terribly wrong.";
@@ -68,7 +79,7 @@ class IDPool {
 		return IDToBeBorrowed;
 	}
 
-	void returnID(int id) {
+	public void returnID(int id) {
 		if (id < 0) {
 			throw new IllegalArgumentException(String.format("Illegal argument 'id': " +
 					"id >= 0 expected, %d provided.", id));

@@ -58,4 +58,18 @@ public class IDPoolTest {
 		}
 	}
 
+	@Test
+	public void testOverflow() {
+		IDPool pool = new IDPool();
+		for (int i = 0; i < Integer.MAX_VALUE; ++i) {
+			assertTrue(pool.canBorrowID());
+			pool.borrowID();
+		}
+		assertFalse(pool.canBorrowID());
+		assertNull(pool.borrowID());
+		pool.returnID(233);
+		assertTrue(pool.canBorrowID());
+		assertEquals(pool.borrowID(), new Integer(233));
+	}
+
 }

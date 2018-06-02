@@ -159,8 +159,11 @@ public class PageRank {
 		return fromEntity.getLink(toID);
 	}
 
-	public int createEntity() {
-		int newEntityID = idPool.borrowID();
+	public Integer createEntity() {
+		Integer newEntityID = idPool.borrowID();
+		if (newEntityID == null) {
+			throw new RuntimeException("Can't create entities anymore. Maximum number reached.");
+		}
 		Entity newEntity = new Entity(newEntityID);
 		entities.add(newEntity);
 		indexByID.put(newEntityID, entities.size() - 1);

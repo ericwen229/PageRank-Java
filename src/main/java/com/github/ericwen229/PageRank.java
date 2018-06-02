@@ -26,6 +26,10 @@ public class PageRank {
 			return rankValue;
 		}
 
+		void setRankValue(double newRankValue) {
+			this.rankValue = newRankValue;
+		}
+
 		boolean isRankValueUpToDate() {
 			return rankValueUpToDate;
 		}
@@ -51,7 +55,6 @@ public class PageRank {
 					totalWeight -= oldWeight;
 				}
 				totalWeight += weight;
-				setRankValueUpToDate(false);
 			}
 			return oldWeight; // return old value just like a map does
 		}
@@ -62,13 +65,28 @@ public class PageRank {
 				// modifications do take place
 				// then update states
 				totalWeight -= oldWeight;
-				setRankValueUpToDate(false);
 			}
 			return oldWeight; // return old value just like a map does
 		}
 
 		Double getLink(int id) {
 			return weightByID.get(id);
+		}
+
+		double computePRValueByID(int id, double prevPRValue) {
+			double factor = 0.0;
+			if (weightByID.isEmpty()) {
+				factor = 1.0 / entities.size();
+			}
+			else {
+				Double weight = weightByID.get(id);
+				if (weight == null) {
+					factor = (1.0 - alpha) / entities.size();
+				} else {
+					factor = alpha * (weight / totalWeight) + (1.0 - alpha) / entities.size();
+				}
+			}
+			return factor * prevPRValue;
 		}
 	}
 
@@ -113,7 +131,12 @@ public class PageRank {
 		}
 	}
 
+	public Double putLink(int fromID, int toID) {
+		return putLink(fromID, toID, 1.0);
+	}
+
 	public Double putLink(int fromID, int toID, double weight) {
+		// TODO: unset up to date
 		validateArgumentID(fromID, "fromID");
 		validateArgumentID(toID, "toID");
 		if (weight < 0) {
@@ -126,6 +149,7 @@ public class PageRank {
 	}
 
 	public Double removeLink(int fromID, int toID) {
+		// TODO: unset up to date
 		validateArgumentID(fromID, "fromID");
 		validateArgumentID(toID, "toID");
 		Entity fromEntity = getEntityWithID(fromID);
@@ -148,10 +172,14 @@ public class PageRank {
 	}
 
 	public void destroyEntity(int id) {
+		// TODO: unset up to date if there has a link
 		validateArgumentID(id, "id");
+
+		// remove all links pointing to the entity
 		for (Entity entity: entities) {
 			entity.removeLink(id);
 		}
+		// swap the entity to be deleted to the tail
 		int indexOfEntityToDelete = indexByID.get(id);
 		int indexOfTail = entities.size() - 1;
 		if (indexOfEntityToDelete != indexOfTail) {
@@ -159,13 +187,60 @@ public class PageRank {
 			indexByID.put(tailEntityID, indexOfEntityToDelete);
 			Collections.swap(entities, indexOfEntityToDelete, indexOfTail);
 		}
+
+		// remove it from the tail
 		entities.remove(indexOfTail);
 		indexByID.remove(id);
 		idPool.returnID(id);
 	}
 
-	public void updateRankValue() {
-		// TODO: run PageRank here
+	public void runPageRank() {
+		runPageRankIterativeVersion();
+	}
+
+	private double euclideanNormSquared(double[] arr1, double[] arr2) {
+		assert arr1.length == arr2.length: "Input arrays should have same size." +
+				" Something is terribly wrong";
+		double sum = 0.0;
+		for (int i = 0; i < arr1.length; ++i) {
+			double diff = arr1[i] - arr2[i];
+			sum += diff * diff;
+		}
+		return sum;
+	}
+
+	private double computePRValueByID(int id, double[] prevPRValues) {
+		double PRValue = 0.0;
+		for (int i = 0; i < entities.size(); ++i) {
+			Entity currentEntity = entities.get(i);
+			PRValue += currentEntity.computePRValueByID(id, prevPRValues[i]);
+		}
+		return PRValue;
+	}
+
+	private void runPageRankIterativeVersion() {
+		if (entities.size() == 0) return;
+
+		double[] PRValues = new double[entities.size()];
+		double[] prevPRValues = new double[entities.size()];
+		for (int i = 0; i < entities.size(); ++i) {
+			PRValues[i] = entities.get(i).getRankValue();
+			prevPRValues[i] = -PRValues[i];
+		}
+
+		while (euclideanNormSquared(PRValues, prevPRValues) > threshold) {
+			System.arraycopy(PRValues, 0, prevPRValues, 0, PRValues.length);
+			for (int i = 0; i < entities.size(); ++i) {
+				int entityID = entities.get(i).getID();
+				PRValues[i] = computePRValueByID(entityID, prevPRValues);
+			}
+		}
+
+		for (int i = 0; i < entities.size(); ++i) {
+			entities.get(i).setRankValue(PRValues[i]);
+			entities.get(i).setRankValueUpToDate(true);
+			entities.get(i).setRankValueValid(true);
+		}
 	}
 
 	public double getRankValue(int id) {

@@ -87,4 +87,23 @@ public class PageRankTest {
 				() -> rank.getLink(b, c));
 	}
 
+	@Test
+	public void testPageRankAlgorithm() {
+		PageRank rank = new PageRank(0.84, 1e-6);
+		int a = rank.createEntity();
+		int b = rank.createEntity();
+		int c = rank.createEntity();
+		int d = rank.createEntity();
+		rank.putLink(b, a);
+		rank.putLink(c, a);
+		rank.putLink(c, b);
+		rank.putLink(d, b);
+		rank.putLink(d, c);
+		rank.runPageRank();
+		assertEquals(rank.getRankValue(a), 1.70, 0.1);
+		assertEquals(rank.getRankValue(b), 1.04, 0.1);
+		assertEquals(rank.getRankValue(c), 0.74, 0.1);
+		assertEquals(rank.getRankValue(d), 0.52, 0.1);
+	}
+
 }

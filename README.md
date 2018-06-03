@@ -1,5 +1,7 @@
 # PageRank-Java
 
+![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)
+
 An implemenation of the PageRank algorithm in Java.
 
 # Usage

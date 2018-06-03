@@ -4,6 +4,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * Implementation of ID pool.
+ *
+ * <p>This class uses a series of intervals (each consists of interval
+ * start and end) to represent currently available IDs. An <tt>IDPool</tt>
+ * object is initialized with every ID available, hence there's only
+ * one interval [<tt>startID</tt>, <tt>null</tt>) (<tt>startID</tt> can be
+ * specified when construction and <tt>null</tt> represents positive infinity).
+ * Afterwards when IDs get constantly borrowed and returned, intervals
+ * get shrinked, created, merged and deleted.
+ */
 public class IDPool {
 
 	private class Interval {

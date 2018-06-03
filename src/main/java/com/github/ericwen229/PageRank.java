@@ -54,7 +54,6 @@ public class PageRank {
 	 * @since      1.0
 	 */
 	private class Entity {
-		// TODO: modify inner class members' permissions
 
 		/**
 		 * ID used for identification of an entity. Specified by constructor
@@ -438,6 +437,9 @@ public class PageRank {
 
 	/**
 	 * Run PageRank algorithm and update all rank values.
+	 *
+	 * <p>Note that this method can be quite time-consuming if the graph
+	 * gets considerably large.
 	 */
 	public void runPageRank() {
 		runPageRankIterativeVersion();
@@ -450,6 +452,9 @@ public class PageRank {
 	 *
 	 * <p>Note that this method will, if returned normally, mark rank values as
 	 * up-to-date and also valid.
+	 *
+	 * <p>Note that this method can be quite time-consuming if the graph
+	 * gets considerably large.
 	 */
 	private void runPageRankIterativeVersion() {
 		if (entities.size() <= 1) return;

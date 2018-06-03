@@ -60,16 +60,32 @@ public class IDPoolTest {
 
 	@Test
 	public void testOverflow() {
-		IDPool pool = new IDPool();
-		for (int i = 0; i < Integer.MAX_VALUE; ++i) {
+		int IDPoolStart = 2147483600;
+		IDPool pool = new IDPool(IDPoolStart);
+		for (int i = IDPoolStart; i < Integer.MAX_VALUE; ++i) {
 			assertTrue(pool.canBorrowID());
 			pool.borrowID();
 		}
 		assertFalse(pool.canBorrowID());
 		assertNull(pool.borrowID());
-		pool.returnID(233);
-		assertTrue(pool.canBorrowID());
-		assertEquals(pool.borrowID(), new Integer(233));
+	}
+
+	@Test
+	public void testNegativeID() {
+		IDPool pool = new IDPool(Integer.MIN_VALUE);
+		List<Integer> newIDList = new ArrayList<>();
+		for (int i = 0; i < 1000; ++i) {
+			int newID = pool.borrowID();
+			newIDList.add(newID);
+		}
+		for (Integer id: newIDList) {
+			pool.returnID(id);
+		}
+		assertEquals(pool.intervalCount(), 1);
+		for (int i = 0; i < 1000; ++i) {
+			int newID = pool.borrowID();
+			assertEquals(newID, newIDList.get(i).intValue());
+		}
 	}
 
 }

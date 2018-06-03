@@ -38,11 +38,17 @@ public class IDPool {
 
 	}
 
+	private final int startID;
 	private final List<Interval> intervals;
 
 	public IDPool() {
+		this(0);
+	}
+
+	public IDPool(int start) {
+		startID = start;
 		intervals = new LinkedList<>();
-		intervals.add(createInterval(0, null));
+		intervals.add(createInterval(startID, null));
 	}
 
 	private Interval createInterval(int start, Integer end) {
@@ -80,9 +86,9 @@ public class IDPool {
 	}
 
 	public void returnID(int id) {
-		if (id < 0) {
+		if (id < startID) {
 			throw new IllegalArgumentException(String.format("Illegal argument 'id': " +
-					"id >= 0 expected, %d provided.", id));
+					"id >= %d expected, %d provided.", startID, id));
 		}
 		ListIterator<Interval> intervalsIterator = intervals.listIterator();
 		assert intervalsIterator.hasNext(): "There's supposed to be at lease one interval." +

@@ -53,7 +53,7 @@ public class PageRank {
 	 * @author     ericwen229
 	 * @since      1.0
 	 */
-	private class Entity {
+	protected class Entity {
 
 		/**
 		 * ID used for identification of an entity. Specified by constructor
@@ -90,7 +90,7 @@ public class PageRank {
 		 *
 		 * @param id ID of the entity
 		 */
-		protected Entity(int id) {
+		Entity(int id) {
 			this.id = id;
 		}
 
@@ -99,7 +99,7 @@ public class PageRank {
 		 *
 		 * @return ID of the entity
 		 */
-		protected int getID() {
+		int getID() {
 			return id;
 		}
 
@@ -108,7 +108,7 @@ public class PageRank {
 		 *
 		 * @return rank value of the entity
 		 */
-		protected double getRankValue() {
+		double getRankValue() {
 			return rankValue;
 		}
 
@@ -117,7 +117,7 @@ public class PageRank {
 		 *
 		 * @param newRankValue new rank value of the entity
 		 */
-		protected void setRankValue(double newRankValue) {
+		void setRankValue(double newRankValue) {
 			this.rankValue = newRankValue;
 		}
 
@@ -128,7 +128,7 @@ public class PageRank {
 		 *
 		 * @return <tt>true</tt> if current rank value is valid.
 		 */
-		protected boolean isRankValueValid() {
+		boolean isRankValueValid() {
 			return rankValueValid;
 		}
 
@@ -139,7 +139,7 @@ public class PageRank {
 		 *
 		 * @param isValid new rank value state
 		 */
-		protected void setRankValueValid(boolean isValid) {
+		void setRankValueValid(boolean isValid) {
 			rankValueValid = isValid;
 		}
 
@@ -152,7 +152,7 @@ public class PageRank {
 		 * @param weight weight of link
 		 * @return old link weight, <tt>null</tt> if there wasn't a link before
 		 */
-		protected Double putLink(int id, double weight) {
+		Double putLink(int id, double weight) {
 			Double oldWeight = weightByID.put(id, weight);
 			if (!(new Double(weight).equals(oldWeight))) {
 				// modifications do take place
@@ -172,7 +172,7 @@ public class PageRank {
 		 * @param id ID of entity at tail end of the link
 		 * @return old link weight, <tt>null</tt> if there isn't such a link
 		 */
-		protected Double removeLink(int id) {
+		Double removeLink(int id) {
 			Double oldWeight = weightByID.remove(id);
 			if (oldWeight != null) {
 				// modifications do take place
@@ -189,7 +189,7 @@ public class PageRank {
 		 * @param id ID of entity at tail end of the link
 		 * @return weight of the link, <tt>null</tt> if there isn't such a link
 		 */
-		protected Double getLink(int id) {
+		Double getLink(int id) {
 			return weightByID.get(id);
 		}
 
@@ -206,7 +206,7 @@ public class PageRank {
 		 * @return rank value contribution from current entity to the entity
 		 * identified by ID
 		 */
-		protected double computePartialPRValueByID(int id, double prevPRValue) {
+		double computePartialPRValueByID(int id, double prevPRValue) {
 			double factor = 0.0;
 			if (weightByID.isEmpty()) {
 				factor = 1.0 / entities.size();

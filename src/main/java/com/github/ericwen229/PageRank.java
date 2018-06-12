@@ -18,7 +18,7 @@ import java.util.function.Function;
  * or arrows (referred to as links here). This class implements
  * basic operations like creating/destroying entities and links.
  *
- * <p>This class has its own mechanism of managing entities, which uses
+ * <p>This class has its own mechanism of managing entities. It uses
  * an <tt>IDPool</tt> object to allocate IDs and recycle IDs that are abandoned.
  * Each time an entity is created, an ID is returned, which is the
  * only identifier of this entity and is needed when performing
@@ -53,7 +53,7 @@ public class PageRank {
 	 * @author     ericwen229
 	 * @since      1.0
 	 */
-	protected class Entity {
+	private class Entity {
 
 		/**
 		 * ID used for identification of an entity. Specified by constructor
@@ -260,6 +260,7 @@ public class PageRank {
 	 *
 	 * @param alpha damping factor of PageRank algorithm
 	 * @param threshold threshold used to determine convergence
+	 * @throws IllegalArgumentException if (<tt>alpha</tt> &lt; 0 || <tt>alpha</tt> &gt; 1 || threshold &lt;= 0)
 	 */
 	public PageRank(double alpha, double threshold) {
 		if (alpha < 0 || alpha > 1) {
@@ -283,7 +284,13 @@ public class PageRank {
 		this(0.85, 1e-6);
 	}
 
-	public Integer createEntity() {
+	/**
+	 * Create a new entity using newly borrowed ID from ID pool.
+	 *
+	 * @return ID of newly created entity
+	 * @throws RuntimeException if no available IDs left in ID pool
+	 */
+	public int createEntity() {
 		Integer newEntityID = idPool.borrowID();
 		if (newEntityID == null) {
 			throw new RuntimeException("Can't create entities anymore. Maximum number reached.");
@@ -294,6 +301,13 @@ public class PageRank {
 		return newEntityID;
 	}
 
+	/**
+	 * Destroy an entity identified by given ID and all links towards it.
+	 * Return ID to ID pool.
+	 *
+	 * @param id ID of entity to destroy
+	 * @throws IllegalArgumentException if given ID is invalid
+	 */
 	public void destroyEntity(int id) {
 		validateArgumentID(id, "id");
 

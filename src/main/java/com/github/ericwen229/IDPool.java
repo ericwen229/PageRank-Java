@@ -19,8 +19,8 @@ public class IDPool {
 
 	private class Interval {
 
-		int start;
-		Integer end;
+		private int start;
+		private Integer end;
 
 		Interval(int start, Integer end) {
 			this.start = start;
@@ -39,8 +39,16 @@ public class IDPool {
 			start = newStart;
 		}
 
+		void setEnd(int newEnd) {
+			end = newEnd;
+		}
+
 		void incrementStartBy(int step) {
 			start += step;
+		}
+
+		void incrementEndBy(int step) {
+			end += step;
 		}
 
 		boolean include(int id) {

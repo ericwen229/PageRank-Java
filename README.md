@@ -19,7 +19,6 @@ An implemenation of the PageRank algorithm in Java.
 
 ## TODO
 
-* modify access control of inner class Entity
 * add documentation of IDPool
 
 # IDPool

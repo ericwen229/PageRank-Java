@@ -23,10 +23,22 @@ public class IDPool {
 	 */
 	private class Interval {
 
+		/**
+		 * Minimum integer of interval
+		 */
 		private int start;
+
+		/**
+		 * Maximum integer of interval
+		 */
 		private int end;
 
 		Interval(int start, int end) {
+			if (start > end) {
+				throw new IllegalArgumentException(String.format(
+						"Illegal argument 'start' and 'end': start <= end expected," +
+								"%d and %d provided.", start, end));
+			}
 			this.start = start;
 			this.end = end;
 		}

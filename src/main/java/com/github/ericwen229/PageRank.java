@@ -43,187 +43,6 @@ import java.util.function.Function;
 public class PageRank {
 
 	/**
-	 * Implementation of a single entry of adjacency list.
-	 *
-	 * <p>Each <tt>Entity</tt> object represents an entity, which is identified
-	 * by an ID and also identifies other entities with IDs. Its neighbours and
-	 * weights of links are stored in a dictionary. It also manages the
-	 * rank value of this entity.
-	 *
-	 * @author     ericwen229
-	 * @since      1.0
-	 */
-	private class Entity {
-
-		/**
-		 * ID used for identification of an entity. Specified by constructor
-		 * argument.
-		 */
-		private final int id;
-
-		/**
-		 * Mapping from neighbours' IDs to the weights of the links.
-		 */
-		private final Map<Integer, Double> weightByID = new HashMap<>();
-
-		/**
-		 * Rank value of current entity. Will be modified by PageRank algorithm.
-		 * Invalid if initialized and never modified by PageRank algorithm.
-		 */
-		private double rankValue = 1.0;
-
-		/**
-		 * <tt>true</tt> if rank value is valid (if and only if PageRank
-		 * algorithm has been run for at least once).
-		 */
-		private boolean rankValueValid = false;
-
-		/**
-		 * Sum of weights of all neighbours for ease of calculation.
-		 */
-		private double totalWeight = 0.0;
-
-		/**
-		 * Constructs an entity with specified ID. Uniqueness of IDs
-		 * is not checked, hence needs to be guaranteed with an external
-		 * ID pool.
-		 *
-		 * @param id ID of the entity
-		 */
-		Entity(int id) {
-			this.id = id;
-		}
-
-		/**
-		 * Returns ID of the entity.
-		 *
-		 * @return ID of the entity
-		 */
-		int getID() {
-			return id;
-		}
-
-		/**
-		 * Returns rank value of the entity.
-		 *
-		 * @return rank value of the entity
-		 */
-		double getRankValue() {
-			return rankValue;
-		}
-
-		/**
-		 * Set rank value of the entity (without argument checking).
-		 *
-		 * @param newRankValue new rank value of the entity
-		 */
-		void setRankValue(double newRankValue) {
-			this.rankValue = newRankValue;
-		}
-
-		/**
-		 * Returns <tt>true</tt> if current rank value is valid.
-		 * A rank value is valid if and only if PageRank algorithm has
-		 * been run for at least once.
-		 *
-		 * @return <tt>true</tt> if current rank value is valid.
-		 */
-		boolean isRankValueValid() {
-			return rankValueValid;
-		}
-
-		/**
-		 * Set rank value state to the given one. Normally used to
-		 * set rank value state to valid right after PageRank has been
-		 * run.
-		 *
-		 * @param isValid new rank value state
-		 */
-		void setRankValueValid(boolean isValid) {
-			rankValueValid = isValid;
-		}
-
-		/**
-		 * Update link towards entity identified by given ID. Update link weight
-		 * if link already exists (possibly with a different weight),
-		 * otherwise create a new entry with ID as key and weight as value.
-		 *
-		 * @param id ID of entity at tail end of the link
-		 * @param weight weight of link
-		 * @return old link weight, <tt>null</tt> if there wasn't a link before
-		 */
-		Double putLink(int id, double weight) {
-			Double oldWeight = weightByID.put(id, weight);
-			if (!(new Double(weight).equals(oldWeight))) {
-				// modifications do take place
-				// then update states
-				if (oldWeight != null) {
-					totalWeight -= oldWeight;
-				}
-				totalWeight += weight;
-			}
-			return oldWeight; // return old value just like a map does
-		}
-
-		/**
-		 * Remove link towards entity identified by given ID. Do nothing
-		 * if there isn't such a link.
-		 *
-		 * @param id ID of entity at tail end of the link
-		 * @return old link weight, <tt>null</tt> if there isn't such a link
-		 */
-		Double removeLink(int id) {
-			Double oldWeight = weightByID.remove(id);
-			if (oldWeight != null) {
-				// modifications do take place
-				// then update states
-				totalWeight -= oldWeight;
-			}
-			return oldWeight; // return old value just like a map does
-		}
-
-		/**
-		 * Returns weight of link whose tail end identified by given ID. Returns
-		 * <tt>null</tt> if there isn't such a link.
-		 *
-		 * @param id ID of entity at tail end of the link
-		 * @return weight of the link, <tt>null</tt> if there isn't such a link
-		 */
-		Double getLink(int id) {
-			return weightByID.get(id);
-		}
-
-		/**
-		 * Compute partial rank value from current entity to the entity
-		 * identified by given ID. In each iteration, the rank value of one identify
-		 * comes from the sum of such partial values from every entity. Therefore
-		 * to update rank value of one entity in an iteration, invoke this method to
-		 * compute partial rank values (to the entity with the ID) for every
-		 * entity and add them up.
-		 *
-		 * @param id ID of entity whom contribution goes towards
-		 * @param prevPRValue previous rank value of current entity
-		 * @return rank value contribution from current entity to the entity
-		 * identified by ID
-		 */
-		double computePartialPRValueByID(int id, double prevPRValue) {
-			double factor = 0.0;
-			if (weightByID.isEmpty()) {
-				factor = 1.0 / entities.size();
-			}
-			else {
-				Double weight = weightByID.get(id);
-				if (weight == null) {
-					factor = (1.0 - alpha) / entities.size();
-				} else {
-					factor = alpha * (weight / totalWeight) + (1.0 - alpha) / entities.size();
-				}
-			}
-			return factor * prevPRValue;
-		}
-	}
-
-	/**
 	 * Damping factor of PageRank algorithm.
 	 */
 	private final double alpha;
@@ -553,6 +372,188 @@ public class PageRank {
 	 */
 	public boolean isRankValueUpToDate() {
 		return rankValueUpToDate;
+	}
+
+	/**
+	 * Implementation of a single entry of adjacency list.
+	 *
+	 * <p>Each <tt>Entity</tt> object represents an entity, which is identified
+	 * by an ID and also identifies other entities with IDs. Its neighbours and
+	 * weights of links are stored in a dictionary. It also manages the
+	 * rank value of this entity.
+	 *
+	 * @author     ericwen229
+	 * @since      1.0
+	 */
+	private class Entity {
+
+		/**
+		 * ID used for identification of an entity. Specified by constructor
+		 * argument.
+		 */
+		private final int id;
+
+		/**
+		 * Mapping from neighbours' IDs to the weights of the links.
+		 */
+		private final Map<Integer, Double> weightByID = new HashMap<>();
+
+		/**
+		 * Rank value of current entity. Will be modified by PageRank algorithm.
+		 * Invalid if initialized and never modified by PageRank algorithm.
+		 */
+		private double rankValue = 1.0;
+
+		/**
+		 * <tt>true</tt> if rank value is valid (if and only if PageRank
+		 * algorithm has been run for at least once).
+		 */
+		private boolean rankValueValid = false;
+
+		/**
+		 * Sum of weights of all neighbours for ease of calculation.
+		 */
+		private double totalWeight = 0.0;
+
+		/**
+		 * Constructs an entity with specified ID. Uniqueness of IDs
+		 * is not checked, hence needs to be guaranteed with an external
+		 * ID pool.
+		 *
+		 * @param id ID of the entity
+		 */
+		Entity(int id) {
+			this.id = id;
+		}
+
+		/**
+		 * Returns ID of the entity.
+		 *
+		 * @return ID of the entity
+		 */
+		int getID() {
+			return id;
+		}
+
+		/**
+		 * Returns rank value of the entity.
+		 *
+		 * @return rank value of the entity
+		 */
+		double getRankValue() {
+			return rankValue;
+		}
+
+		/**
+		 * Set rank value of the entity (without argument checking).
+		 *
+		 * @param newRankValue new rank value of the entity
+		 */
+		void setRankValue(double newRankValue) {
+			this.rankValue = newRankValue;
+		}
+
+		/**
+		 * Returns <tt>true</tt> if current rank value is valid.
+		 * A rank value is valid if and only if PageRank algorithm has
+		 * been run for at least once.
+		 *
+		 * @return <tt>true</tt> if current rank value is valid.
+		 */
+		boolean isRankValueValid() {
+			return rankValueValid;
+		}
+
+		/**
+		 * Set rank value state to the given one. Normally used to
+		 * set rank value state to valid right after PageRank has been
+		 * run.
+		 *
+		 * @param isValid new rank value state
+		 */
+		void setRankValueValid(boolean isValid) {
+			rankValueValid = isValid;
+		}
+
+		/**
+		 * Update link towards entity identified by given ID. Update link weight
+		 * if link already exists (possibly with a different weight),
+		 * otherwise create a new entry with ID as key and weight as value.
+		 *
+		 * @param id ID of entity at tail end of the link
+		 * @param weight weight of link
+		 * @return old link weight, <tt>null</tt> if there wasn't a link before
+		 */
+		Double putLink(int id, double weight) {
+			Double oldWeight = weightByID.put(id, weight);
+			if (!(new Double(weight).equals(oldWeight))) {
+				// modifications do take place
+				// then update states
+				if (oldWeight != null) {
+					totalWeight -= oldWeight;
+				}
+				totalWeight += weight;
+			}
+			return oldWeight; // return old value just like a map does
+		}
+
+		/**
+		 * Remove link towards entity identified by given ID. Do nothing
+		 * if there isn't such a link.
+		 *
+		 * @param id ID of entity at tail end of the link
+		 * @return old link weight, <tt>null</tt> if there isn't such a link
+		 */
+		Double removeLink(int id) {
+			Double oldWeight = weightByID.remove(id);
+			if (oldWeight != null) {
+				// modifications do take place
+				// then update states
+				totalWeight -= oldWeight;
+			}
+			return oldWeight; // return old value just like a map does
+		}
+
+		/**
+		 * Returns weight of link whose tail end identified by given ID. Returns
+		 * <tt>null</tt> if there isn't such a link.
+		 *
+		 * @param id ID of entity at tail end of the link
+		 * @return weight of the link, <tt>null</tt> if there isn't such a link
+		 */
+		Double getLink(int id) {
+			return weightByID.get(id);
+		}
+
+		/**
+		 * Compute partial rank value from current entity to the entity
+		 * identified by given ID. In each iteration, the rank value of one identify
+		 * comes from the sum of such partial values from every entity. Therefore
+		 * to update rank value of one entity in an iteration, invoke this method to
+		 * compute partial rank values (to the entity with the ID) for every
+		 * entity and add them up.
+		 *
+		 * @param id ID of entity whom contribution goes towards
+		 * @param prevPRValue previous rank value of current entity
+		 * @return rank value contribution from current entity to the entity
+		 * identified by ID
+		 */
+		double computePartialPRValueByID(int id, double prevPRValue) {
+			double factor = 0.0;
+			if (weightByID.isEmpty()) {
+				factor = 1.0 / entities.size();
+			}
+			else {
+				Double weight = weightByID.get(id);
+				if (weight == null) {
+					factor = (1.0 - alpha) / entities.size();
+				} else {
+					factor = alpha * (weight / totalWeight) + (1.0 - alpha) / entities.size();
+				}
+			}
+			return factor * prevPRValue;
+		}
+
 	}
 
 }

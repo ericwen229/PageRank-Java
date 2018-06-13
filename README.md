@@ -23,7 +23,7 @@ An implemenation of the PageRank algorithm in Java.
 
 # IDPool
 
-A byproduct of this project used to manage IDs.
+An implementation of ID pool used to manage IDs.
 
 ## Usage
 

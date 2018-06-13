@@ -17,12 +17,16 @@ import java.util.ListIterator;
  */
 public class IDPool {
 
+	/**
+	 * Implementation of integer interval represented as [<tt>start</tt>,
+	 * <tt>end</tt>].
+	 */
 	private class Interval {
 
 		private int start;
-		private Integer end;
+		private int end;
 
-		Interval(int start, Integer end) {
+		Interval(int start, int end) {
 			this.start = start;
 			this.end = end;
 		}
@@ -31,7 +35,7 @@ public class IDPool {
 			return start;
 		}
 
-		Integer getEnd() {
+		int getEnd() {
 			return end;
 		}
 
@@ -52,13 +56,13 @@ public class IDPool {
 		}
 
 		boolean include(int id) {
-			return (id >= start) && (end == null || id <= end);
+			return id >= start && id <= end;
 		}
 
 	}
 
 	private final int startID;
-	private final List<Interval> intervals;
+	private final List<Interval> availableIntervals;
 
 	public IDPool() {
 		this(0);
@@ -66,20 +70,19 @@ public class IDPool {
 
 	public IDPool(int start) {
 		startID = start;
-		intervals = new LinkedList<>();
-		intervals.add(createInterval(startID, null));
+		availableIntervals = new LinkedList<>();
+		availableIntervals.add(createInterval(startID, Integer.MAX_VALUE));
 	}
 
-	private Interval createInterval(int start, Integer end) {
+	private Interval createInterval(int start, int end) {
 		return new Interval(start, end);
 	}
 
 	public boolean canBorrowID() {
 		// whether all non-negative IDs have been used
-		// i.e. there's only one interval [INT_MAX, null) left
+		// i.e. there's only one interval [INT_MAX, INT_MAX] left
 		// we can't use INT_MAX, or the interval can't be represented correctly
-		// therefore there're INT_MAX IDs available in total
-		Interval firstInterval = intervals.get(0);
+		Interval firstInterval = availableIntervals.get(0);
 		return firstInterval.getStart() < Integer.MAX_VALUE;
 	}
 
@@ -87,19 +90,19 @@ public class IDPool {
 		if (!canBorrowID()) {
 			return null;
 		}
-		Interval firstInterval = intervals.get(0);
+		Interval firstInterval = availableIntervals.get(0);
 		assert firstInterval != null: "There's supposed to be at lease one interval." +
 				" Something is terribly wrong.";
 		int intervalStart = firstInterval.getStart();
-		Integer intervalEnd = firstInterval.getEnd();
+		int intervalEnd = firstInterval.getEnd();
 		int IDToBeBorrowed = intervalStart;
-		if (intervalEnd == null || intervalStart < intervalEnd) {
+		if (intervalStart < intervalEnd) {
 			firstInterval.incrementStartBy(1);
 		}
 		else {
-			intervals.remove(0);
+			availableIntervals.remove(0);
 		}
-		assert !intervals.isEmpty(): "There's supposed to be at lease one interval." +
+		assert !availableIntervals.isEmpty(): "There's supposed to be at lease one interval." +
 				" Something is terribly wrong.";
 		return IDToBeBorrowed;
 	}
@@ -109,7 +112,7 @@ public class IDPool {
 			throw new IllegalArgumentException(String.format("Illegal argument 'id': " +
 					"id >= %d expected, %d provided.", startID, id));
 		}
-		ListIterator<Interval> intervalsIterator = intervals.listIterator();
+		ListIterator<Interval> intervalsIterator = availableIntervals.listIterator();
 		assert intervalsIterator.hasNext(): "There's supposed to be at lease one interval." +
 				" Something is terribly wrong.";
 		while (intervalsIterator.hasNext()) {
@@ -165,7 +168,7 @@ public class IDPool {
 					if (previousIntervalEnd == id - 1) {
 						// if current interval can be concatenated
 						// with the previous interval
-						// then merge the two intervals
+						// then merge the two availableIntervals
 						// by extending the current interval
 						// and removing the previous interval
 						currentInterval.setStart(previousInterval.getStart());
@@ -182,8 +185,7 @@ public class IDPool {
 	}
 
 	int intervalCount() {
-		// this method is only used for testing
-		return intervals.size();
+		return availableIntervals.size();
 	}
 
 }

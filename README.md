@@ -19,7 +19,7 @@ An implemenation of the PageRank algorithm in Java.
 
 ## TODO
 
-* add documentation of IDPool
+* add thread safe support
 
 # IDPool
 

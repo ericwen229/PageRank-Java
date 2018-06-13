@@ -75,6 +75,13 @@ public class PageRank {
 	private boolean rankValueUpToDate = false;
 
 	/**
+	 * Constructs an PageRank object with default parameters.
+	 */
+	public PageRank() {
+		this(0.85, 1e-6);
+	}
+
+	/**
 	 * Constructs an PageRank object with specified parameters.
 	 *
 	 * @param alpha damping factor of PageRank algorithm
@@ -97,14 +104,7 @@ public class PageRank {
 	}
 
 	/**
-	 * Constructs an PageRank object with default parameters.
-	 */
-	public PageRank() {
-		this(0.85, 1e-6);
-	}
-
-	/**
-	 * Create a new entity using newly borrowed ID from ID pool.
+	 * Creates a new entity using newly borrowed ID from ID pool.
 	 *
 	 * @return ID of newly created entity
 	 * @throws RuntimeException if no available IDs left in ID pool
@@ -121,8 +121,8 @@ public class PageRank {
 	}
 
 	/**
-	 * Destroy an entity identified by given ID and all links towards it.
-	 * Return ID to ID pool.
+	 * Destroys an entity identified by given ID and all links towards it.
+	 * Returns ID to ID pool.
 	 *
 	 * @param id ID of entity to destroy
 	 * @throws IllegalArgumentException if given ID is invalid
@@ -188,11 +188,11 @@ public class PageRank {
 	}
 
 	/**
-	 * Update link identified by given IDs. Update link weight
+	 * Updates link identified by given IDs. Update link weight
 	 * if link already exists (possibly with a different weight),
 	 * otherwise create a new entry with ID as key and weight as value.
 	 *
-	 * <p>Note that this method will, if returned normally, always mark
+	 * <p>Note that this method, if returned normally, always marks
 	 * rank value as not up-to-date.
 	 *
 	 * @param fromID ID of entity at head end of the link
@@ -217,9 +217,9 @@ public class PageRank {
 	}
 
 	/**
-	 * Update link using default weight.
+	 * Updates link using default weight.
 	 *
-	 * <p>Note that this method will, if returned normally, always mark
+	 * <p>Note that this method, if returned normally, always marks
 	 * rank value as not up-to-date.
 	 *
 	 * @param fromID ID of entity at head end of the link
@@ -232,10 +232,10 @@ public class PageRank {
 	}
 
 	/**
-	 * Remove link identified by given IDs. Do nothing if
+	 * Removes link identified by given IDs. Do nothing if
 	 * there wasn't a link before.
 	 *
-	 * <p>Note that this method will, if returned normally, always mark
+	 * <p>Note that this method, if returned normally, always marks
 	 * rank value as not up-to-date.
 	 *
 	 * @param fromID ID of entity at head end of the link
@@ -254,7 +254,7 @@ public class PageRank {
 	}
 
 	/**
-	 * Get link weight identified by given IDs.
+	 * Gets link weight identified by given IDs.
 	 *
 	 * @param fromID ID of entity at head end of the link
 	 * @param toID ID of entity at tail end of the link
@@ -269,7 +269,7 @@ public class PageRank {
 	}
 
 	/**
-	 * Run PageRank algorithm and update all rank values.
+	 * Runs PageRank algorithm and update all rank values.
 	 *
 	 * <p>Note that this method can be quite time-consuming if the graph
 	 * gets considerably large.
@@ -279,11 +279,11 @@ public class PageRank {
 	}
 
 	/**
-	 * Run the iterative version of PageRank algorithm. Starting from current
+	 * Runs the iterative version of PageRank algorithm. Starting from current
 	 * rank values, iterate until convergence which is determined using the
 	 * constant threshold.
 	 *
-	 * <p>Note that this method will, if returned normally, mark rank values as
+	 * <p>Note that this method, if returned normally, marks rank values as
 	 * up-to-date and also valid.
 	 *
 	 * <p>Note that this method can be quite time-consuming if the graph
@@ -381,9 +381,6 @@ public class PageRank {
 	 * by an ID and also identifies other entities with IDs. Its neighbours and
 	 * weights of links are stored in a dictionary. It also manages the
 	 * rank value of this entity.
-	 *
-	 * @author     ericwen229
-	 * @since      1.0
 	 */
 	private class Entity {
 
@@ -445,7 +442,7 @@ public class PageRank {
 		}
 
 		/**
-		 * Set rank value of the entity (without argument checking).
+		 * Sets rank value of the entity (without argument checking).
 		 *
 		 * @param newRankValue new rank value of the entity
 		 */
@@ -465,7 +462,7 @@ public class PageRank {
 		}
 
 		/**
-		 * Set rank value state to the given one. Normally used to
+		 * Sets rank value state to the given one. Normally used to
 		 * set rank value state to valid right after PageRank has been
 		 * run.
 		 *
@@ -476,7 +473,7 @@ public class PageRank {
 		}
 
 		/**
-		 * Update link towards entity identified by given ID. Update link weight
+		 * Updates link towards entity identified by given ID. Update link weight
 		 * if link already exists (possibly with a different weight),
 		 * otherwise create a new entry with ID as key and weight as value.
 		 *
@@ -498,7 +495,7 @@ public class PageRank {
 		}
 
 		/**
-		 * Remove link towards entity identified by given ID. Do nothing
+		 * Removes link towards entity identified by given ID. Do nothing
 		 * if there isn't such a link.
 		 *
 		 * @param id ID of entity at tail end of the link
@@ -526,7 +523,7 @@ public class PageRank {
 		}
 
 		/**
-		 * Compute partial rank value from current entity to the entity
+		 * Computes partial rank value from current entity to the entity
 		 * identified by given ID. In each iteration, the rank value of one identify
 		 * comes from the sum of such partial values from every entity. Therefore
 		 * to update rank value of one entity in an iteration, invoke this method to

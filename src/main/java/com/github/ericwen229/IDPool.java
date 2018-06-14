@@ -64,7 +64,7 @@ public class IDPool {
 	 *
 	 * @return <tt>true</tt> if there're any available ID left
 	 */
-	public boolean canBorrowID() {
+	public synchronized boolean canBorrowID() {
 		// whether all non-negative IDs have been used
 		// i.e. there's only one interval [INT_MAX, INT_MAX] left
 		// we can't use INT_MAX, or the interval can't be represented correctly
@@ -77,7 +77,7 @@ public class IDPool {
 	 *
 	 * @return ID borrowed, <tt>null</tt> if no available IDs
 	 */
-	public Integer borrowID() {
+	public synchronized Integer borrowID() {
 		if (!canBorrowID()) {
 			return null;
 		}
@@ -104,7 +104,7 @@ public class IDPool {
 	 * @param id ID to return
 	 * @throws IllegalArgumentException if ID not borrowed or illegal (less than smallest legal ID)
 	 */
-	public void returnID(int id) {
+	public synchronized void returnID(int id) {
 		if (id < startID) {
 			throw new IllegalArgumentException(String.format("Illegal argument 'id': " +
 					"id >= %d expected, %d provided.", startID, id));
@@ -186,7 +186,7 @@ public class IDPool {
 	 *
 	 * @return number of intervals
 	 */
-	int intervalCount() {
+	synchronized int intervalCount() {
 		return availableIntervals.size();
 	}
 

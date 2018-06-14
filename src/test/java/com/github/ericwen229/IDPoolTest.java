@@ -88,4 +88,28 @@ public class IDPoolTest {
 		}
 	}
 
+	@Test
+	public void testSynchronization() {
+		IDPool pool = new IDPool();
+		List<Thread> threads = new ArrayList<>();
+		for (int i = 0; i < 5; ++i) {
+			threads.add(new Thread(() -> {
+				for (int k = 0; k < 10000; ++k) {
+					pool.borrowID();
+				}
+			}));
+		}
+		for (Thread thread: threads) {
+			thread.start();
+		}
+		for (Thread thread: threads) {
+			try {
+				thread.join();
+			}
+			catch (InterruptedException e) {}
+		}
+		assertEquals(pool.intervalCount(), 1);
+		assertEquals(50000, pool.borrowID().intValue());
+	}
+
 }
